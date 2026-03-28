@@ -52,6 +52,7 @@ def main():
 
     last_frame_time = time.time()
     last_telemetry_time = time.time()
+    frame_count = 0
 
     try:
         while True:
@@ -95,6 +96,10 @@ def main():
                     'type': 'thermal',
                     'data': thermal_bytes
                 })
+
+                frame_count += 1
+                if frame_count % 30 == 0:
+                    print(f"Successfully captured and sent {frame_count} frames...")
 
             # Send Telemetry Data every 2 seconds
             if current_time - last_telemetry_time >= 2.0:
