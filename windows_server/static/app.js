@@ -17,6 +17,9 @@ const viewControls = document.getElementById('view-controls');
 const streamEmpty = document.getElementById('stream-empty');
 const feedStandard = document.getElementById('feed-standard');
 const feedThermal = document.getElementById('feed-thermal');
+const extInfoPanel = document.getElementById('rover-extended-info');
+const extUptime = document.getElementById('ext-uptime');
+const extWifiVal = document.getElementById('ext-wifi-val');
 const imgStandard = document.getElementById('img-standard');
 const imgThermal = document.getElementById('img-thermal');
 const telemetryStats = document.getElementById('telemetry-stats');
@@ -170,6 +173,10 @@ function selectDevice(deviceId) {
     streamEmpty.style.display = 'block';
     feedStandard.style.display = 'none';
     feedThermal.style.display = 'none';
+    if (extInfoPanel) {
+        extInfoPanel.style.display = 'block';
+        startChartSimulation();
+    }
     telemetryStats.style.display = 'none';
     viewControls.style.display = 'none';
     
@@ -182,6 +189,8 @@ function selectDevice(deviceId) {
 
     if (!deviceId) {
         activeDeviceTitle.innerText = "Select a Rover";
+        if (extInfoPanel) extInfoPanel.style.display = 'none';
+        stopChartSimulation();
         logAlert("No active rover selected", false);
         return;
     }
@@ -250,3 +259,98 @@ document.querySelectorAll('.rover-marker').forEach(marker => {
 
 // Initial render
 renderDeviceList(fleet);
+
+// --- Extended Charts Logic ---
+let batteryChart = null;
+let wifiChart = null;
+let simulationInterval = null;
+let uptimeSeconds = 120 * 60 + 14 * 60 + 33; // Starts at 02h 14m 33s
+
+function initCharts() {
+    const ctxBattery = document.getElementById('chart-battery').getContext('2d');
+    const ctxWifi = document.getElementById('chart-wifi').getContext('2d');
+
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { display: false },
+            y: { display: false, border: { display: false } }
+        },
+        elements: { point: { radius: 0 } },
+        animation: { duration: 200 }
+    };
+
+    batteryChart = new Chart(ctxBattery, {
+        type: 'line',
+        data: {
+            labels: Array(20).fill(''),
+            datasets: [{
+                data: Array(20).fill(80),
+                borderColor: '#10b981',
+                borderWidth: 2,
+                tension: 0.4
+            }]
+        },
+        options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, min: 0, max: 100 } } }
+    });
+
+    wifiChart = new Chart(ctxWifi, {
+        type: 'line',
+        data: {
+            labels: Array(20).fill(''),
+            datasets: [{
+                data: Array(20).fill(-65),
+                borderColor: '#eab308',
+                borderWidth: 2,
+                tension: 0.4
+            }]
+        },
+        options: { ...commonOptions, scales: { x: { display: false }, y: { display: false, min: -90, max: -40 } } }
+    });
+}
+
+function updateUptimeDisplay() {
+    const h = Math.floor(uptimeSeconds / 3600).toString().padStart(2, '0');
+    const m = Math.floor((uptimeSeconds % 3600) / 60).toString().padStart(2, '0');
+    const s = (uptimeSeconds % 60).toString().padStart(2, '0');
+    extUptime.innerText = `${h}:${m}:${s}`;
+}
+
+function startChartSimulation() {
+    if (!batteryChart) initCharts();
+    if (simulationInterval) clearInterval(simulationInterval);
+    
+    simulationInterval = setInterval(() => {
+        // Battery static at 80
+        const bData = batteryChart.data.datasets[0].data;
+        bData.push(80);
+        bData.shift();
+        batteryChart.update();
+
+        // WiFi config: between -80 and -50
+        const wData = wifiChart.data.datasets[0].data;
+        let lastW = wData[wData.length - 1];
+        let newW = lastW + (Math.random() * 4 - 2);
+        if (newW > -50) newW = -50;
+        if (newW < -80) newW = -80;
+        
+        wData.push(newW);
+        wData.shift();
+        
+        extWifiVal.innerText = `${Math.round(newW)} dBm`;
+        wifiChart.update();
+
+        uptimeSeconds++;
+        updateUptimeDisplay();
+
+    }, 1000);
+}
+
+function stopChartSimulation() {
+    if (simulationInterval) {
+        clearInterval(simulationInterval);
+        simulationInterval = null;
+    }
+}

@@ -87,6 +87,36 @@
                         <img id="img-thermal" alt="Thermal Video Feed">
                     </div>
                 </div>
+
+                <!-- Extended Info Panel (Uptime, Battery, WiFi) -->
+                <div class="rover-extended-info" id="rover-extended-info" style="display: none; margin-top: 1rem;">
+                    <div class="stat-box full-width" style="margin-bottom: 0.5rem;">
+                        <span class="label">Uptime</span>
+                        <span class="value" id="ext-uptime">00:00:00</span>
+                    </div>
+
+                    <div class="charts-grid" style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+                        <div class="stat-box chart-box">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span class="label">Battery</span>
+                                <span class="value" id="ext-battery-val" style="font-size: 1rem; color: var(--accent-green);">80%</span>
+                            </div>
+                            <div class="canvas-wrapper" style="height: 60px; position: relative;">
+                                <canvas id="chart-battery"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="stat-box chart-box">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span class="label">WiFi Signal</span>
+                                <span class="value" id="ext-wifi-val" style="font-size: 1rem; color: #eab308;">-65 dBm</span>
+                            </div>
+                            <div class="canvas-wrapper" style="height: 60px; position: relative;">
+                                <canvas id="chart-wifi"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
 
@@ -112,6 +142,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/app.js"></script>
 </body>
 

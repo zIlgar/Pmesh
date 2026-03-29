@@ -337,10 +337,11 @@ h2 {
 /* Floating PiP Overlay */
 .pip-overlay-card {
     position: absolute;
-    top: 1.5rem;
+    top: 1rem;
     right: 1.5rem;
+    bottom: 1rem;
     width: 420px;
-    background: rgba(28, 30, 46, 0.7);
+    background: rgba(28, 30, 46, 0.85);
     backdrop-filter: blur(12px);
     border: 1px solid var(--accent-blue);
     box-shadow: 0 8px 32px rgba(0,0,0,0.8), 0 0 20px var(--accent-blue-glow);
@@ -350,18 +351,26 @@ h2 {
     display: flex;
     flex-direction: column;
     transition: all 0.3s ease;
+    overflow-y: auto;
 }
 
 .pip-overlay-card .viewer-header {
     margin-bottom: 0.8rem;
+    flex-shrink: 0;
 }
 
 .pip-overlay-card .stream-container {
     background: transparent;
     border: none;
     padding: 0;
-    height: 250px;
-    min-height: auto;
+    height: 220px;
+    min-height: 220px;
+    flex-shrink: 0;
+}
+
+.pip-overlay-card .rover-extended-info {
+    flex-shrink: 0;
+    overflow: hidden;
 }
 
 .pip-overlay-card .view-controls {
@@ -445,4 +454,18 @@ h2 {
 }
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.2);
+}
+
+/* Extended Info Charts Neon Effects */
+#chart-battery {
+    filter: drop-shadow(0 0 8px rgba(16, 185, 129, 1));
+}
+
+#chart-wifi {
+    filter: drop-shadow(0 0 8px rgba(234, 179, 8, 1));
+}
+
+.stat-box.chart-box {
+    padding-bottom: 6px;
+    padding-top: 8px;
 }
